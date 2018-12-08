@@ -38,8 +38,9 @@ public class Launch {
         ProfessorHibernate ph = new ProfessorHibernate();
         
         
-        for(int i = 0 ; i<10; i++){
-            Exercicio e = new Exercicio( "quebra peito"+ gerador.nextInt(1000), "descricao666");
+        
+        for(int i = 0 ; i<1; i++){
+            Exercicio e = new Exercicio( "quebra peito nulo"+ gerador.nextInt(1000),null );
             Exercicio e2 = new Exercicio( "quebra custela"+ gerador.nextInt(1000), "descricao");
             eh.adiciona(e2);
             eh.adiciona(e);
@@ -47,7 +48,6 @@ public class Launch {
             exercicios.add(e);
             exercicios.add(e2);
         }
-        
         
         
         Professor p = new Professor("cregf", "cpf111", "nome", "endereco", "sexo",LocalDate.of(1999,03,22), "email", "s");
@@ -59,31 +59,37 @@ public class Launch {
         p=ph.recuperarCpf("cpf111");
         
 
-        Aluno a = new Aluno("objetivo", 0, 100, null, "cpf222", "nome","endereco", "sexo", LocalDate.of(1982, 03, 22)," email", "senha");
-        Aluno a2 = new Aluno("objetivo", 0, 100, null, "CPFFRESCO"+ gerador.nextInt(1000), "nome","endereco", "sexo", LocalDate.now()," email", "senha");
+        Aluno a = new Aluno("objetivo", 0, 0, null, "cpf222", "nome","endereco", "sexo", LocalDate.of(1982, 03, 22)," email", "senha");
+        Aluno a2 = new Aluno("objetivo", 0, 0, null, "cpf333", "nome","endereco", "sexo", LocalDate.now()," email", "senha");
         
         ah.adiciona(a);
         ah.adiciona(a2);
         
-        a = ah.recuperarCpf("cpf222");
+       a = ah.recuperar(11);
+//        a2 = ah.recuperarCpf("cpf333");
        
-            
-        Treino t = new Treino("treino1"+ gerador.nextInt(1000), 
-                    "descricao", 0, p, "sid", exercicios, a,true);
-            
+        Treino t = new Treino("treino"+ gerador.nextInt(1000), 
+                    "descricao", 0, p, "sid", exercicios, a, false);
         
-           th.adiciona(t);
+        Treino t2 = new Treino("treino"+ gerador.nextInt(1000), 
+                "descricao", 0, p2, "sid", exercicios, a2, false);
+    
+ 
         
-            treinos.add(t);
-            
-            
-          
+        th.adiciona(t);
+        treinos.add(t);
+        
+        th.adiciona(t2);
+        treinos.add(t2);
+        
         a=ah.recuperarCpf("cpf222");
         a.setTreinos(treinos);
         ah.alterar(a);
-          
+     
         
-           for (int i = 0; i<10; i++){
+     
+        
+           for (int i = 0; i<00; i++){
                
                Aluno aa = new Aluno("objetivo", 0, 0, null, 
                        "cpf222" + gerador.nextInt(1000), "nome","endereco", 
@@ -96,7 +102,6 @@ public class Launch {
                ph.adiciona(pp);
            }
            
-        
         
      
         

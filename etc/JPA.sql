@@ -81,3 +81,36 @@ CREATE TABLE treino_exercicio
 
 
 
+
+
+CREATE OR REPLACE FUNCTION tempoTreino()
+  RETURNS trigger AS
+$BODY$
+
+
+    BEGIN
+        -- Verificar se o tempo de treino para homens é maior que 10min
+       
+                          
+	IF new.duracao <10 THEN 
+		
+		IF not exists (select sexo from aluno a
+			where sexo = 'M' and a.codigo in 
+			(select new.cod_aluno from new)) = 'M' then
+			 
+	RAISE EXCEPTION '% não pode ser menor que 10 minutos', NEW.duracao;
+	
+		END IF;
+         
+        END IF;
+  
+      
+        RETURN NEW;
+    END;
+  
+ $BODY$
+  LANGUAGE plpgsql;
+
+  
+  CREATE TRIGGER tempoTreino BEFORE INSERT OR UPDATE ON treino
+    FOR EACH ROW EXECUTE PROCEDURE tempoTreino();
