@@ -77,40 +77,33 @@ CREATE TABLE treino_exercicio
 
 
 
+CREATE FUNCTION crefProfessor() RETURNS trigger AS $crefProfessor$
+BEGIN
 
-
-
-
-
-
-CREATE OR REPLACE FUNCTION tempoTreino()
-  RETURNS trigger AS
-$BODY$
-
-
-    BEGIN
-        -- Verificar se o tempo de treino para homens é maior que 10min
-       
-                          
-	IF new.duracao <10 THEN 
-		
-		IF not exists (select sexo from aluno a
-			where sexo = 'M' and a.codigo in 
-			(select new.cod_aluno from new)) = 'M' then
-			 
-	RAISE EXCEPTION '% não pode ser menor que 10 minutos', NEW.duracao;
+	IF NEW.cref IS NULL THEN
+	RAISE EXCEPTION 'O Cref do Professor não pode ser nulo';
+	END IF;
 	
-		END IF;
-         
-        END IF;
-  
-      
-        RETURN NEW;
-    END;
-  
- $BODY$
-  LANGUAGE plpgsql;
+	IF NEW.nome IS NULL THEN
+	RAISE EXCEPTION '% não pode ter um nome nulo', NEW.nome;
+	END IF;
 
-  
-  CREATE TRIGGER tempoTreino BEFORE INSERT OR UPDATE ON treino
-    FOR EACH ROW EXECUTE PROCEDURE tempoTreino();
+RETURN NEW;
+END;
+$crefProfessor$ LANGUAGE plpgsql;
+
+CREATE TRIGGER crefProfessor BEFORE INSERT OR UPDATE ON Professor
+FOR EACH ROW EXECUTE PROCEDURE crefProfessor();
+
+
+    
+
+CREATE ASSERTION restricaoDuracaoTreino
+CHECK
+(not exists  (select * from aluno a
+		where sexo = 'M' and a.codigo in 
+		(select cod_aluno 
+		from treino 
+		where duracao < 10)));
+
+    
