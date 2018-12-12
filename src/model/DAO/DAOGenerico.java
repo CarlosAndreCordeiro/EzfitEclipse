@@ -7,6 +7,8 @@ package model.DAO;
 
 import java.util.List;
 
+import model.Professor;
+
 /**
  *
  * @author wemerson

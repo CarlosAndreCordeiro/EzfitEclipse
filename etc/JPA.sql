@@ -1,4 +1,4 @@
-ï»¿
+--=====================INSERTS ================================--
 
 CREATE TABLE aluno
 (
@@ -14,8 +14,9 @@ CREATE TABLE aluno
   objetivo character varying(50),
   peso double precision,
   CONSTRAINT aluno_pkey PRIMARY KEY (codigo),
-  CONSTRAINT uk_g6otv1ccqwf8a15re4tc1sr9q UNIQUE (cpf)
+  CONSTRAINT  UNIQUE (cpf)
 );
+
 CREATE TABLE professor
 (
   codigo integer NOT NULL,
@@ -28,7 +29,7 @@ CREATE TABLE professor
   sexo character varying(10),
   cref character varying(20),
   CONSTRAINT professor_pkey PRIMARY KEY (codigo),
-  CONSTRAINT uk_f9xdq98nhl68237568oxfu6l4 UNIQUE (cpf)
+  CONSTRAINT  UNIQUE (cpf)
 );
 
 CREATE TABLE exercicio
@@ -37,7 +38,7 @@ CREATE TABLE exercicio
   descricao character varying(255),
   nome character varying(20),
   CONSTRAINT exercicio_pkey PRIMARY KEY (codigo),
-  CONSTRAINT uk_ij9l0vq68vkc9mhl417ghs8p UNIQUE (nome)
+  CONSTRAINT  UNIQUE (nome)
 );
 
 
@@ -52,13 +53,13 @@ CREATE TABLE treino
   cod_aluno integer,
   cod_professor integer,
   CONSTRAINT treino_pkey PRIMARY KEY (codigo),
-  CONSTRAINT fka5fmb94t7mvaduwsqxq9gwpsj FOREIGN KEY (cod_professor)
+  CONSTRAINT FOREIGN KEY (cod_professor)
       REFERENCES professor (codigo) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fkhyu6vrfnn8cfcohis8pluh5sq FOREIGN KEY (cod_aluno)
+  CONSTRAINT  FOREIGN KEY (cod_aluno)
       REFERENCES aluno (codigo) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT uk_429bw9ei7l17shn4wvcyw67ei UNIQUE (nome)
+  CONSTRAINT  UNIQUE (nome)
 );
 
 
@@ -66,38 +67,87 @@ CREATE TABLE treino_exercicio
 (
   treino_codigo integer NOT NULL,
   exercicios_codigo integer NOT NULL,
-  CONSTRAINT fk53d7wj07smw3ov8p8bnv2b99x FOREIGN KEY (treino_codigo)
+  CONSTRAINT  FOREIGN KEY (treino_codigo)
       REFERENCES treino (codigo) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk8sr03a75pmuls504v0v4mtcl0 FOREIGN KEY (exercicios_codigo)
+  CONSTRAINT  FOREIGN KEY (exercicios_codigo)
       REFERENCES exercicio (codigo) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT uk_c85ypew2wd4n1fnvoeuy4vcdw UNIQUE (exercicios_codigo)
+  CONSTRAINT  UNIQUE (exercicios_codigo)
 );
 
 
 
+--=====================GATILHOS ================================--
+
+-- Professor nao pode ter nome nem cref Nulos.
 CREATE FUNCTION crefProfessor() RETURNS trigger AS $crefProfessor$
 BEGIN
 
 	IF NEW.cref IS NULL THEN
-	RAISE EXCEPTION 'O Cref do Professor não pode ser nulo';
+		RAISE EXCEPTION 'O Cref do Professor não pode ser nulo';
 	END IF;
 	
 	IF NEW.nome IS NULL THEN
-	RAISE EXCEPTION '% não pode ter um nome nulo', NEW.nome;
+		RAISE EXCEPTION '% Professor não pode ter um nome nulo', NEW.nome;
 	END IF;
+	
 
 RETURN NEW;
 END;
 $crefProfessor$ LANGUAGE plpgsql;
-
 CREATE TRIGGER crefProfessor BEFORE INSERT OR UPDATE ON Professor
 FOR EACH ROW EXECUTE PROCEDURE crefProfessor();
 
 
     
+-- Aluno nao pode ter o nome nulo.
+CREATE FUNCTION nomeAluno() RETURNS trigger AS $nomeAluno$
+BEGIN
 
+	IF NEW.nome IS NULL THEN
+	RAISE EXCEPTION '% Aluno não pode ter um nome nulo', NEW.nome;
+	END IF;
+
+RETURN NEW;
+END;
+$nomeAluno$ LANGUAGE plpgsql;
+CREATE TRIGGER nomeAluno BEFORE INSERT OR UPDATE ON Aluno
+FOR EACH ROW EXECUTE PROCEDURE nomeAluno();
+
+
+
+--Aluno nao pode iniciar um treino sem ter terminado o treino anterior.
+create or replace function novoTreinoDoAluno() returns trigger as $$
+declare aux integer;
+
+BEGIN
+	aux = (select treino.cod_aluno from aluno, treino where aluno.codigo = treino.cod_aluno and treino.realizado= 'false');
+		if(aux= new.cod_aluno) then 	
+			raise exception 'o Aluno ainda nao completou o treino anterior';
+		else 
+			return new;
+		end if;
+END 
+$$
+language 'plpgsql';
+create trigger novoTreinoDoAluno before insert on treino for each row execute procedure novoTreinoDoAluno();
+
+
+    
+--=====================ASSERTIONS ================================--
+
+
+-- Um aluno no pode ter mais de dois treinos.
+create Assertion restricao_tyreinoAluno
+CHECK
+	(exists(select codigo from treino
+		group by codigo
+		HAVING 2> (select count (*) from treino, aluno 
+		where aluno.codigo = cod_aaluno and realizado = 'false')));
+
+
+--Nenhum aluno do sexo masculino pode ter um treino com duraçao inferior a 10.
 CREATE ASSERTION restricaoDuracaoTreino
 CHECK
 (not exists  (select * from aluno a
@@ -105,5 +155,15 @@ CHECK
 		(select cod_aluno 
 		from treino 
 		where duracao < 10)));
+		
+		
+		
+-- Um treino nao pode ter mais que 10 exercicios
+CREATE ASSERTION restricao_treino
+CHECK
+	(not exists (select t.codigo from treino as t
+				where 10 < any (select cout(exercicios_codigo) 
+					from t5reino_exercicio 
+					where t.codigo = treino_codigo)));
 
     

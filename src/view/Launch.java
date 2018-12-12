@@ -41,8 +41,10 @@ public class Launch {
         
         
         
+        
+        
         for(int i = 0 ; i<1; i++){
-            Exercicio e = new Exercicio( "quebra peito nulo"+ gerador.nextInt(1000),null );
+            Exercicio e = new Exercicio( "quebra peito nulo"+ gerador.nextInt(1000),"descrito" );
             Exercicio e2 = new Exercicio( "quebra custela"+ gerador.nextInt(1000), "descricao");
             eh.adiciona(e2);
             eh.adiciona(e);
@@ -55,68 +57,54 @@ public class Launch {
         }
         
         
-        Professor p = new Professor("cregf", "cpf111", "nome", "endereco", "sexo",LocalDate.of(1999,03,22), "email", "s");
-
-
+        for(int i = 0; i<10;i++){
+        
+        
+        Professor p = new Professor("cregf", "cpf" + i, "professor Desenrolado", "endereco", "sexo",LocalDate.of(1999,03,22), "email", "s");
+        
+        
+        
         ph.adiciona(p);
         
-        Professor p2 = new Professor("cregf2", "cpf111"+ gerador.nextInt(1000), "nome", "endereco", "sexo",LocalDate.of(1999,03,22), "email", "s");
 
+        p  =ph.recuperarCpf("cpf" + i);
 
-        ph.adiciona(p2);
         
-       
-        p  =ph.recuperarCpf("cpf111");
 
- 
-
-        Aluno a = new Aluno("objetivo", 0, 0, null, "cpf22", "nome","endereco", "M", LocalDate.of(1982, 03, 22)," email", "senha");
-        Aluno a2 = new Aluno("objetivo", 0, 0, null, "cpf333", "nome","endereco", "F", LocalDate.now()," email", "senha");
+        Aluno a = new Aluno("objetivo", 0, 0, null, "cpf22"+i, "nome","endereco", "M", LocalDate.of(1982, 03, 22)," email", "senha");
         
         ah.adiciona(a);
-        ah.adiciona(a2);
+
         
-        a  = ah.recuperarCpf("cpf22");
-        a2 = ah.recuperarCpf("cpf333");
+        a  = ah.recuperarCpf("cpf22"+i);
+
        
         Treino t = new Treino("treino primeiro"+ gerador.nextInt(1000), 
                     "descricao", 20, p, "sid", exercicios, a, false);
         
         Treino t2 = new Treino("treino Segundo"+ gerador.nextInt(1000), 
-                "descricao", 10, p, "sid", exercicios2, a2, false);
+                "descricao", 10, p, "sid", exercicios2, a, false);
 
 
         th.adiciona(t);
         th.adiciona(t2);
         
         treinos.add(t);
-        treinos2.add(t2);
-        
+        treinos.add(t2);
+
         
         a.setTreinos(treinos);
-        a2.setTreinos(treinos2);
+
         
         ah.alterar(a);
-        ah.alterar(a2);
+     
+     
+    }
      
         
+
      
-        
-           for (int i = 0; i<1; i++){
-               
-               Aluno aa = new Aluno("objetivo", 0, 0, null, 
-                       "cpf222" + gerador.nextInt(1000), "nome","endereco", 
-                       "sexo", LocalDate.of(1982, 03, 22)," email", "senha");
-               ah.adiciona(aa);
-               
-       Professor pp = new Professor("Cref", 
-                       "cpf111"+ gerador.nextInt(1000), null, "endereco", 
-                       "sexo", LocalDate.of(1982, 03, 22), "email", "s");
-               ph.adiciona(pp);
-           }
-           
-        
-     
+      
         
     }
     

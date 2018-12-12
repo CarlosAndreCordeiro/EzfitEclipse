@@ -20,11 +20,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-/**
- *
- * @author $Carlos Cordeiro <carloscordeiroconsultor@gmail.com>
- */
-
 
 /**
  *
@@ -52,7 +47,7 @@ public class Treino {
 
 	    
 	    @OneToOne 
-	    @JoinColumn(name = "professor_" )
+	    @JoinColumn(name = "cod_professor" )
 	    private Professor professor;   
 	    
 	    @Column(length = 6)
@@ -63,7 +58,7 @@ public class Treino {
 	    private List<Exercicio> exercicios;
 	    
 	    @ManyToOne		
-	    @JoinColumn(name = "aluno_id" )
+	    @JoinColumn(name = "cod_aluno" )
 	    private Aluno aluno;
 	    
 	    @Column

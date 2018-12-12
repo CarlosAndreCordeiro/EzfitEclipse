@@ -119,6 +119,29 @@ public class ProfessorHibernate implements ProfessorDao {
 
     }
 
+    
+    @Override
+    public Professor recuperarPorNome(String nome) {
+        EntityManager em = JPAManager.getInstance().getEntityManager();
+        
+        try {
+
+            return (Professor) em.createQuery("From Professor Where nome like'%" + nome + "%'").getResultList().get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Nome do professor n„o encontrado!!");
+            return null;
+
+        } finally {
+            //Fechamos a sess√£o
+            em.close();
+        }
+    }
+    
+    
+    
+    
+    
     @Override
     public Professor recuperarCpf(String cpf) {
         EntityManager em = JPAManager.getInstance().getEntityManager();
@@ -128,7 +151,7 @@ public class ProfessorHibernate implements ProfessorDao {
             return (Professor) em.createQuery("From Professor Where cpf='" + cpf + "'").getResultList().get(0);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("CPF do professor n√£o encontrado!!");
+            System.out.println("CPF do professor n„o encontrado!!");
             return null;
 
         } finally {
@@ -136,4 +159,6 @@ public class ProfessorHibernate implements ProfessorDao {
             em.close();
         }
     }
+
+	
 }

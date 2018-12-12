@@ -107,11 +107,11 @@ public class TreinoHibernate implements TreinoDao {
         EntityManager em = JPAManager.getInstance().getEntityManager();
         
         try {
-
-            return (Treino) em.createQuery("From Treino Where nome='" + nome + "'").getResultList().get(0);
+        															
+            return (Treino) em.createQuery("From Treino Where nome like'%" + nome + "%'").getResultList().get(0);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Nome do treino n√£o encontrado!!");
+            System.out.println("Nome do treino n„o encontrado!!");
             return null;
 
         } finally {

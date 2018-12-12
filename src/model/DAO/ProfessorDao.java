@@ -16,4 +16,5 @@ public interface ProfessorDao extends DAOGenerico<Professor>{
   
     public boolean logarProfessor(String login,String senha); 
     public Professor recuperarCpf(String cpf);
+	public Professor recuperarPorNome(String nome);
 }
