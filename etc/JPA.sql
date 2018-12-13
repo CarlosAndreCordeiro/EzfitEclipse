@@ -1,4 +1,6 @@
---=====================INSERTS ================================--
+
+
+--========================CREATE TABLES===========================--
 
 CREATE TABLE aluno
 (
@@ -14,7 +16,7 @@ CREATE TABLE aluno
   objetivo character varying(50),
   peso double precision,
   CONSTRAINT aluno_pkey PRIMARY KEY (codigo),
-  CONSTRAINT  UNIQUE (cpf)
+  UNIQUE (cpf)
 );
 
 CREATE TABLE professor
@@ -29,7 +31,7 @@ CREATE TABLE professor
   sexo character varying(10),
   cref character varying(20),
   CONSTRAINT professor_pkey PRIMARY KEY (codigo),
-  CONSTRAINT  UNIQUE (cpf)
+  UNIQUE (cpf)
 );
 
 CREATE TABLE exercicio
@@ -38,7 +40,7 @@ CREATE TABLE exercicio
   descricao character varying(255),
   nome character varying(20),
   CONSTRAINT exercicio_pkey PRIMARY KEY (codigo),
-  CONSTRAINT  UNIQUE (nome)
+  UNIQUE (nome)
 );
 
 
@@ -53,13 +55,13 @@ CREATE TABLE treino
   cod_aluno integer,
   cod_professor integer,
   CONSTRAINT treino_pkey PRIMARY KEY (codigo),
-  CONSTRAINT FOREIGN KEY (cod_professor)
+  FOREIGN KEY (cod_professor)
       REFERENCES professor (codigo) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT  FOREIGN KEY (cod_aluno)
+  FOREIGN KEY (cod_aluno)
       REFERENCES aluno (codigo) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT  UNIQUE (nome)
+  UNIQUE (nome)
 );
 
 
@@ -67,29 +69,80 @@ CREATE TABLE treino_exercicio
 (
   treino_codigo integer NOT NULL,
   exercicios_codigo integer NOT NULL,
-  CONSTRAINT  FOREIGN KEY (treino_codigo)
+  FOREIGN KEY (treino_codigo)
       REFERENCES treino (codigo) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT  FOREIGN KEY (exercicios_codigo)
+  FOREIGN KEY (exercicios_codigo)
       REFERENCES exercicio (codigo) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT  UNIQUE (exercicios_codigo)
+  UNIQUE (exercicios_codigo)
 );
 
 
 
---=====================GATILHOS ================================--
+--===================== INSERTS ================================--
+
+
+	-- Insert Professor
+insert into professor values(1,'cpf', '1982-03-01', 'email', 
+	'endereco', 'nome do prof', 'senha', 'sexo', 'crefff');
+insert into professor values(2,'cpf2', '1982-03-01', 'email', 
+	'endereco', 'nome do prof2', 'senha', 'sexo', 'creff');
+
+	-- Insert Aluno
+insert into aluno values(3,'cpf3ss', '1982-03-01', 'email', 
+	'endereco', 'nome do Aluno', 'senha', 'sexo', 10, 'objetivo');
+insert into aluno values(4,'cpf4ss', '1982-03-01', 'email', 
+	'endereco', 'nome do aluno4', 'senha', 'sexo', 10,'objetivo2');
+
+	-- Insert Exercicio
+insert into exercicio values(1,'descricao', 'nome'); 
+insert into exercicio values(2,'descricao2', 'nome2'); 
+insert into exercicio values(3,'descricao3', 'nome3'); 
+
+	-- Insert Treino
+insert into treino values(1,'descricao',10, 'alta', 'nome', 
+	false, 3, 1); 
+insert into treino values(2,'descricao3',10, 'alta', 'nome3', 
+	false, 4, 2); 
+
+	-- Insert treino_exercicio
+insert into treino_exercicio values(1,2); 
+insert into treino_exercicio values(1,1); 
+
+insert into treino_exercicio values(2,2); 
+insert into treino_exercicio values(2,1); 
+
+
+	-- ALTERANDO TABELAS --
+update professor set cref='crefAlterado' where codigo=2;
+update aluno set nome='Tiago Eduardo' where codigo = 3;
+update exercicio set nome = 'burpee' where codigo = 1;
+update treino set duracao=20 where codigo =1;
+
+
+	-- DELETANDO TABELAS --
+delete from treino_exercicio
+delete from treino
+delete from exercicio
+delete from aluno
+delete from professor
+
+
+
+
+--===================== TRIGGERS ================================--
 
 -- Professor nao pode ter nome nem cref Nulos.
 CREATE FUNCTION crefProfessor() RETURNS trigger AS $crefProfessor$
 BEGIN
 
 	IF NEW.cref IS NULL THEN
-		RAISE EXCEPTION 'O Cref do Professor n„o pode ser nulo';
+		RAISE EXCEPTION 'O Cref do Professor n√£o pode ser nulo';
 	END IF;
 	
 	IF NEW.nome IS NULL THEN
-		RAISE EXCEPTION '% Professor n„o pode ter um nome nulo', NEW.nome;
+		RAISE EXCEPTION '% Professor n√£o pode ter um nome nulo', NEW.nome;
 	END IF;
 	
 
@@ -106,7 +159,7 @@ CREATE FUNCTION nomeAluno() RETURNS trigger AS $nomeAluno$
 BEGIN
 
 	IF NEW.nome IS NULL THEN
-	RAISE EXCEPTION '% Aluno n„o pode ter um nome nulo', NEW.nome;
+	RAISE EXCEPTION '% Aluno n√£o pode ter um nome nulo', NEW.nome;
 	END IF;
 
 RETURN NEW;
@@ -135,7 +188,7 @@ create trigger novoTreinoDoAluno before insert on treino for each row execute pr
 
 
     
---=====================ASSERTIONS ================================--
+--===================== ASSERTIONS ================================--
 
 
 -- Um aluno no pode ter mais de dois treinos.
@@ -147,7 +200,8 @@ CHECK
 		where aluno.codigo = cod_aaluno and realizado = 'false')));
 
 
---Nenhum aluno do sexo masculino pode ter um treino com duraÁao inferior a 10.
+
+--Nenhum aluno do sexo masculino "M" pode ter um treino com duracao inferior a 10.
 CREATE ASSERTION restricaoDuracaoTreino
 CHECK
 (not exists  (select * from aluno a
@@ -155,7 +209,7 @@ CHECK
 		(select cod_aluno 
 		from treino 
 		where duracao < 10)));
-		
+
 		
 		
 -- Um treino nao pode ter mais que 10 exercicios
